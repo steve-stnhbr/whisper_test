@@ -30,3 +30,6 @@ pipe = pipeline(
 
 result = pipe(FILE_NAME)
 print(result["text"])
+with open("out/output.txt", "w") as f:
+  for p in result["chunks"]:
+    f.write(p["text"])
