@@ -81,10 +81,10 @@ def main(args):
 
         #aveform = splitter.audio
         #sample_rate = splitter.audio.frame_rate
+        print("Loading audio from", file)
         waveform, sample_rate = torchaudio.load(file)
 
         if diarization is None:
-            dataframe = False
             with ProgressHook() as hook:
                 diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=options.speakers)
             
@@ -95,20 +95,16 @@ def main(args):
                 df_dia.loc[-1] = [speech_turn.start, speech_turn.end, speaker]
                 df_dia.index = df_dia.index + 1
                 df_dia = df_dia.sort_index()
-            df_dia.to_csv(f"out/{basename(file)}_diarization.csv")
+            df_dia.to_csv(f"out/{basename(file)}_diarization.csv", index=False)
+            diarization = df_dia
             print(f"Finished diarizing {file}")
         else:
-            dataframe = True
             print(f"Using diarization from {options.diarization}")
 
         speaker_before = None
         with open(f"out/{basename(file)}.txt", 'a') as f:
-            if not dataframe:
-                for turn, _, speaker in tqdm(diarization.itertracks(yield_label=True), desc="ASR"):
-                    speaker_before = process_dia(pipe, turn.start, turn.end, speaker, speaker_before, f, splitter)
-            else:
-                for row in tqdm(dataframe.itertuples(index=False), desc="ASR"):
-                    speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter)
+            for row in tqdm(diarization.itertuples(index=False), desc="ASR"):
+                speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter)
         print(f"Finished transcribing {file}, deleting inters")
 
         for inter in listdir("inter"):
