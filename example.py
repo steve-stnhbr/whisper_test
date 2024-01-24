@@ -31,6 +31,8 @@ def main(args):
 
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+    print("Using device:", device)
+    print("Using dtype:", torch_dtype)
 
     model_id = "openai/whisper-large-v3"
 
@@ -68,7 +70,7 @@ def main(args):
         diarization = pd.read_csv(options.diarization)
     else:
         diarization = None
-        
+
     for file in files:
         print(f"Transcribing {file}")
         splitter = Splitter(file, "inter")
