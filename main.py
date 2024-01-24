@@ -1,9 +1,10 @@
 import torch
 from transformers import pipeline
 import torchaudio
+from tqdm.auto import tqdm
 
 
-mp3_file_path = 'test.m4a'
+mp3_file_path = '__data/test.mp3'
 print(f"loading file{mp3_file_path}")
 # Load the audio file using torchaudio
 waveform, sample_rate = torchaudio.load(mp3_file_path)
@@ -22,7 +23,7 @@ pipe = pipeline(
 print(f"starting prediction")
 
 # we can also return timestamps for the predictions
-prediction = pipe(waveform.numpy(), batch_size=8, return_timestamps=True)["chunks"]
+prediction = tqdm(pipe(mp3_file_path, batch_size=8, return_timestamps=True))["chunks"]
 with open("out/output.txt", "w") as f:
   for p in prediction:
     f.write(p["text"])
