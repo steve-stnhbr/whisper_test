@@ -83,7 +83,7 @@ def main(args):
         #sample_rate = splitter.audio.frame_rate
         print("Loading audio from", file)
         waveform = splitter.waveform
-        sample_rate = splitter.audio.sample_rate
+        sample_rate = splitter.sample_rate
 
         if diarization is None:
             with ProgressHook() as hook:
