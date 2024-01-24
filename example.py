@@ -19,6 +19,7 @@ def main(args):
     parser.add_option("-i", "--input", dest="input", help="Input file to transcribe", metavar="INPUT_FILE")
     parser.add_option("-o", "--output", dest="output", help="Output file to write to", metavar="OUTPUT_FILE")
     parser.add_option("-m", "--model", dest="model", help="ASR model to use", metavar="ASR_MODEL", default="openai/whisper-large-v3")
+    parser.add_option("-s", "--speakers", dest="speakers", help="Number of speakers", metavar="SPEAKERS", default=2)
 
     (options, args) = parser.parse_args(args)
 
@@ -80,12 +81,12 @@ def main(args):
 
         #aveform = splitter.audio
         #sample_rate = splitter.audio.frame_rate
-        waveform, sample_rate = torchaudio.load("audio.wav")
+        waveform, sample_rate = torchaudio.load(file)
 
         if diarization is None:
             dataframe = False
             with ProgressHook() as hook:
-                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook)
+                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=options.speakers)
             
             print("Finished diarization")
             # store the results in a file
