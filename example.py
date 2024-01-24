@@ -13,6 +13,8 @@ from optparse import OptionParser
 import torchaudio
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 
+DEFAULT_MIN_LENGTH = 5
+
 def main(args):
     parser = OptionParser()
     parser.add_option("-d", "--diarization", dest="diarization", help="Diarization model to use", metavar="DIA_FILE")
@@ -20,6 +22,7 @@ def main(args):
     parser.add_option("-o", "--output", dest="output", help="Output file to write to", metavar="OUTPUT_FILE")
     parser.add_option("-m", "--model", dest="model", help="ASR model to use", metavar="ASR_MODEL", default="openai/whisper-large-v3")
     parser.add_option("-s", "--speakers", dest="speakers", help="Number of speakers", metavar="SPEAKERS")
+    parser.add_option("-l", "--min-length", dest="min_length", help="Minimum length of a speech turn", metavar="MIN_LENGTH", default=DEFAULT_MIN_LENGTH)
 
     (options, args) = parser.parse_args(args)
 
@@ -106,7 +109,7 @@ def main(args):
         with open(f"out/{basename(file)}.txt", 'a') as f:
             diarization.sort_values(by=['start'], inplace=True)
             for _, row in tqdm(diarization.iterrows(), desc="ASR", total=diarization.shape[0]):
-                speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter)
+                speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter, options.min_length)
         print(f"Finished transcribing {file}, deleting inters")
 
         for inter in listdir("inter"):
@@ -114,7 +117,9 @@ def main(args):
             if isfile(file):
                 remove(file) 
 
-def process_dia(pipe, start, end, speaker, speaker_before, f, splitter):
+def process_dia(pipe, start, end, speaker, speaker_before, f, splitter, min_length):
+    if end - start < min_length:
+        return speaker_before
     intermediary_file = splitter.single_split(start, end)
     try:
         result = pipe(intermediary_file)
