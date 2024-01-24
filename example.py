@@ -107,6 +107,8 @@ def main(args):
 
         speaker_before = None
         with open(f"out/{basename(file)}.txt", 'a') as f:
+            diarization['duration'] = diarization['stop'] - diarization['start']
+            diarization = diarization[diarization['duration'] > options.min_length]
             diarization.sort_values(by=['start'], inplace=True)
             for _, row in tqdm(diarization.iterrows(), desc="ASR", total=diarization.shape[0]):
                 speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter, options.min_length)
