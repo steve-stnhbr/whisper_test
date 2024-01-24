@@ -104,6 +104,7 @@ def main(args):
 
         speaker_before = None
         with open(f"out/{basename(file)}.txt", 'a') as f:
+            diarization.sort_values(by=['start'], inplace=True)
             for _, row in tqdm(diarization.iterrows(), desc="ASR", total=diarization.shape[0]):
                 speaker_before = process_dia(pipe, row['start'], row['stop'], row['speaker'], speaker_before, f, splitter)
         print(f"Finished transcribing {file}, deleting inters")
@@ -127,10 +128,9 @@ def process_dia(pipe, start, end, speaker, speaker_before, f, splitter):
 
     print(f"{speaker}:{result['text']}")
     if speaker_before != speaker:
-        f.write(f"{speaker}:\n")
+        f.write(f"\n{speaker}:\n")
         speaker_before = speaker
     f.write(result["text"])
-    f.write("\n")
     return speaker_before
 
 if __name__ == "__main__":
