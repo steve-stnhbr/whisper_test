@@ -20,8 +20,8 @@ class Splitter():
     
     def single_split(self, from_s, to_s):
         print(f"Extracting {self.filepath} ({from_s}, {to_s})")
-        t1 = from_s * self.sample_rate
-        t2 = to_s * self.sample_rate
+        t1 = int(from_s * self.sample_rate)
+        t2 = int(to_s * self.sample_rate)
         split_audio = self.waveform[t1:t2]
         name = basename(self.filepath)
         file_name = self.out_folder + f'/{name}_split_{int(from_s)}_{int(to_s)}.wav'
