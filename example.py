@@ -114,7 +114,15 @@ def main(args):
 
 def process_dia(pipe, start, end, speaker, speaker_before, f, splitter):
     intermediary_file = splitter.single_split(start, end)
-    result = pipe(intermediary_file)
+    try:
+        result = pipe(intermediary_file)
+    except Exception as e:
+        print(f"Error while processing {intermediary_file}: {e}")
+        if speaker_before != speaker:
+            f.write(f"{speaker}:\n")
+            speaker_before = speaker
+        f.write(f"--ERROR({start}s-{end}s)--\n")
+        return speaker_before
 
     print(f"{speaker}:{result['text']}")
     if speaker_before != speaker:
