@@ -86,7 +86,7 @@ def main(args):
 
         if diarization is None:
             with ProgressHook() as hook:
-                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=options.speakers)
+                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=int(options.speakers))
             
             print("Finished diarization")
             # store the results in a file
