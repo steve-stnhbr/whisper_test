@@ -19,7 +19,7 @@ def main(args):
     parser.add_option("-i", "--input", dest="input", help="Input file to transcribe", metavar="INPUT_FILE")
     parser.add_option("-o", "--output", dest="output", help="Output file to write to", metavar="OUTPUT_FILE")
     parser.add_option("-m", "--model", dest="model", help="ASR model to use", metavar="ASR_MODEL", default="openai/whisper-large-v3")
-    parser.add_option("-s", "--speakers", dest="speakers", help="Number of speakers", metavar="SPEAKERS", default=2)
+    parser.add_option("-s", "--speakers", dest="speakers", help="Number of speakers", metavar="SPEAKERS")
 
     (options, args) = parser.parse_args(args)
 
