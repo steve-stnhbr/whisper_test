@@ -79,14 +79,15 @@ def main(args):
         splitter = Splitter(file, "inter")
         print(f"Diarizing {file}")
 
-        #aveform = splitter.audio
+        #waveform = splitter.audio
         #sample_rate = splitter.audio.frame_rate
         print("Loading audio from", file)
-        waveform, sample_rate = torchaudio.load(file)
+        waveform = splitter.waveform
+        sample_rate = splitter.audio.sample_rate
 
         if diarization is None:
             with ProgressHook() as hook:
-                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=int(options.speakers))
+                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook, num_speakers=int(options.speakers) if options.speakers is not None else None)
             
             print("Finished diarization")
             # store the results in a file
