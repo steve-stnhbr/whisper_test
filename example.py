@@ -10,6 +10,8 @@ from os.path import isfile, join, basename
 from tqdm.auto import tqdm
 import pandas as pd
 from optparse import OptionParser
+import torchaudio
+from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 def main(args):
     parser = OptionParser()
@@ -75,9 +77,16 @@ def main(args):
         print(f"Transcribing {file}")
         splitter = Splitter(file, "inter")
         print(f"Diarizing {file}")
+
+        #aveform = splitter.audio
+        #sample_rate = splitter.audio.frame_rate
+        waveform, sample_rate = torchaudio.load("audio.wav")
+
         if diarization is None:
             dataframe = False
-            diarization = pipeline(file)
+            with ProgressHook() as hook:
+                diarization = pipeline({"waveform": waveform, "sample_rate": sample_rate}, hook=hook)
+            
             print("Finished diarization")
             # store the results in a file
             df_dia = pd.DataFrame(columns=['start', 'stop', 'speaker'])
